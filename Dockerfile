@@ -12,8 +12,8 @@ LABEL org.opencontainers.image.authors="bitcoder2021@gmail.com" \
 
 RUN apk -U add curl skopeo openssl bash
 
-WORKDIR /
+WORKDIR /scripts
 
-COPY air_gap_all_the_things.sh /
+COPY air_gap_all_the_things.sh /scripts/air_gap_all_the_things.sh
 
-ENTRYPOINT [ "/air_gap_all_the_things.sh build" ]
+ENTRYPOINT [ "/scripts/air_gap_all_the_things.sh build" ]
