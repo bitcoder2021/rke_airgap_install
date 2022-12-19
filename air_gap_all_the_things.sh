@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# yum install -y vim && mkdir /opt/rancher && cd /opt/rancher && curl -#OL https://raw.githubusercontent.com/clemenko/rke_airgap_install/main/air_gap_all_the_things.sh && chmod 755 air_gap_all_the_things.sh
+# apt install -y vim && mkdir /opt/rancher && cd /opt/rancher && curl -#OL https://raw.githubusercontent.com/bitcoder2021/rke_airgap_install/main/air_gap_all_the_things.sh && chmod 755 air_gap_all_the_things.sh
 
 set -ebpf
 
@@ -25,7 +25,7 @@ export NO_COLOR='\x1b[0m'
 function build () {
 
   echo - Installing packages
-  yum install zstd skopeo -y > /dev/null 2>&1
+  apt install zstd skopeo -y > /dev/null 2>&1
 
   mkdir -p /opt/rancher/rke2_$RKE_VERSION/
   cd /opt/rancher/rke2_$RKE_VERSION/
@@ -118,13 +118,13 @@ function build () {
     skopeo copy docker://$i docker-archive:rancher/$(echo $i| awk -F/ '{print $2}'|sed 's/:/_/g').tar:$(echo $i| awk -F/ '{print $2}') > /dev/null 2>&1
   done
 
-  curl -#L https://github.com/clemenko/rke_airgap_install/raw/main/registry.tar -o registry/registry_2.tar > /dev/null 2>&1
+  curl -#L https://github.com/bitcoder2021/rke_airgap_install/raw/main/registry.tar -o registry/registry_2.tar > /dev/null 2>&1
 
   # add flask app and yaml.
   skopeo copy docker://redis docker-archive:flask/redis.tar > /dev/null 2>&1
   skopeo copy docker://mongo docker-archive:flask/mongo.tar > /dev/null 2>&1
-  skopeo copy docker://clemenko/flask_demo docker-archive:flask/flask_demo.tar > /dev/null 2>&1
-  curl -#L https://raw.githubusercontent.com/clemenko/rke_airgap_install/main/flask.yaml -o /opt/rancher/images/flask/flask.yaml > /dev/null 2>&1
+  skopeo copy docker://bitcoder2021/flask_demo docker-archive:flask/flask_demo.tar > /dev/null 2>&1
+  curl -#L https://raw.githubusercontent.com/bitcoder2021/rke_airgap_install/main/flask.yaml -o /opt/rancher/images/flask/flask.yaml > /dev/null 2>&1
 
   cd /opt/rancher/
   echo - compress all the things
@@ -134,7 +134,7 @@ function build () {
 
   echo "------------------------------------------------------------------"
   echo " to uncompress : "
-  echo "   yum install -y zstd"
+  echo "   apt install -y zstd"
   echo "   mkdir /opt/rancher"
   echo "   tar -I zstd -vxf rke2_rancher_longhorn.zst -C /opt/rancher"
   echo "------------------------------------------------------------------"
@@ -199,7 +199,7 @@ EOF
 sysctl -p > /dev/null 2>&1
 
   echo install packages
-  yum install -y zstd nfs-utils iptables skopeo container-selinux iptables libnetfilter_conntrack libnfnetlink libnftnl policycoreutils-python-utils cryptsetup iscsi-initiator-utils
+  apt install -y zstd nfs-utils iptables skopeo container-selinux iptables libnetfilter_conntrack libnfnetlink libnftnl policycoreutils-python-utils cryptsetup iscsi-initiator-utils
   systemctl enable iscsid && systemctl start iscsid
   echo -e "[keyfile]\nunmanaged-devices=interface-name:cali*;interface-name:flannel*" > /etc/NetworkManager/conf.d/rke2-canal.conf
 }
@@ -230,7 +230,7 @@ function deploy_control () {
 
  # insall rke2 - stig'd
   INSTALL_RKE2_ARTIFACT_PATH=/opt/rancher/rke2_$RKE_VERSION sh /opt/rancher/rke2_$RKE_VERSION/install.sh 
-  yum install -y /opt/rancher/rke2_$RKE_VERSION/rke2-common-$RKE_VERSION.rke2r1-0.x86_64.rpm /opt/rancher/rke2_$RKE_VERSION/rke2-selinux-0.9-1.el8.noarch.rpm
+  apt install -y /opt/rancher/rke2_$RKE_VERSION/rke2-common-$RKE_VERSION.rke2r1-0.x86_64.rpm /opt/rancher/rke2_$RKE_VERSION/rke2-selinux-0.9-1.el8.noarch.rpm
   systemctl enable rke2-server.service && systemctl start rke2-server.service
 
   sleep 30
@@ -352,7 +352,7 @@ function deploy_worker () {
   # install rke2
   cd /opt/rancher
   INSTALL_RKE2_ARTIFACT_PATH=/opt/rancher/rke2_$RKE_VERSION INSTALL_RKE2_TYPE=agent sh /opt/rancher/rke2_$RKE_VERSION/install.sh 
-  yum install -y /opt/rancher/rke2_$RKE_VERSION/rke2-common-$RKE_VERSION.rke2r1-0.x86_64.rpm /opt/rancher/rke2_$RKE_VERSION/rke2-selinux-0.9-1.el8.noarch.rpm
+  apt install -y /opt/rancher/rke2_$RKE_VERSION/rke2-common-$RKE_VERSION.rke2r1-0.x86_64.rpm /opt/rancher/rke2_$RKE_VERSION/rke2-selinux-0.9-1.el8.noarch.rpm
 
   rsync -avP /opt/rancher/images/registry/registry_2.tar /var/lib/rancher/rke2/agent/images/
   
